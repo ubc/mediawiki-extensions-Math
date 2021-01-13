@@ -358,20 +358,18 @@ class MathHooks {
 		foreach ( self::$tags as $key => $tag ) {
 			$value = call_user_func_array( [ self::class, 'mathPostTagHook' ], $tag );
 			// Workaround for https://phabricator.wikimedia.org/T103269
-			$text = preg_replace( '/(<mw:editsection[^>]*>.*?)' . preg_quote( $key ) .
-				'(.*?)<\/mw:editsection>/',
-				'\1 $' . htmlspecialchars( $tag[0]->getTex() ) . '\2</mw:editsection>', $text );
-			$text = str_replace( $key, $value, $text );
+			$text = preg_replace(
+				'/(<mw:editsection[^>]*>.*?)' . preg_quote( $key ) . '(.*?)<\/mw:editsection>/',
+				'\1 $' . htmlspecialchars( $tag[0]->getTex() ) . '\2</mw:editsection>',
+				$text
+			);
+			$count = 0;
+			$text = str_replace( $key, $value, $text, $count );
+			if ( $count ) {
+				// This hook might be called multiple times. However once the tag is rendered the job is done.
+				unset( self::$tags[ $key ] );
+			}
 		}
-		// Commenting out the following code. When a page has both Math and DPL3, math formulas
-		// that comes before dynamic page list won't be rendered.
-		// This may have impact on performance.
-		// References:
-		// https://phabricator.wikimedia.org/T274316
-		// https://github.com/Universal-Omega/DynamicPageList3/issues/6
-		//
-		// This hook might be called multiple times. However one the tags are rendered the job is done.
-		// self::$tags = [];
 		return true;
 	}
 
