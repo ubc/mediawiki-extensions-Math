@@ -363,8 +363,15 @@ class MathHooks {
 				'\1 $' . htmlspecialchars( $tag[0]->getTex() ) . '\2</mw:editsection>', $text );
 			$text = str_replace( $key, $value, $text );
 		}
+		// Commenting out the following code. When a page has both Math and DPL3, math formulas
+		// that comes before dynamic page list won't be rendered.
+		// This may have impact on performance.
+		// References:
+		// https://phabricator.wikimedia.org/T274316
+		// https://github.com/Universal-Omega/DynamicPageList3/issues/6
+		//
 		// This hook might be called multiple times. However one the tags are rendered the job is done.
-		self::$tags = [];
+		// self::$tags = [];
 		return true;
 	}
 
